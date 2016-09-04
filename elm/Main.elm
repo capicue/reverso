@@ -1,6 +1,7 @@
 import Html exposing (..)
 import Html.App as App
 
+main : Program Never
 main =
   App.program
     { init = init
