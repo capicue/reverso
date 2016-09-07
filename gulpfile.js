@@ -21,7 +21,7 @@ gulp.task('elm-init', function() {
 gulp.task('elm', ['elm-init'], function() {
     return gulp.src(config.elm.src)
         .pipe(plumber())
-        .pipe(elm.make({filetype: "html", warn: true}))
+        .pipe(elm.bundle("index.html", {filetype: "html"}))
         .pipe(gulp.dest(config.elm.dest));
 });
 
