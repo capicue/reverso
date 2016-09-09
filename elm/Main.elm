@@ -160,62 +160,88 @@ view model =
                 Nothing ->
                     div [] []
 
-        selectStyle =
+        selectContainerStyle =
             style
                 [ ( "width", "20%" )
-                , ( "color", "#2b4564" )
-                , ( "height", "36px" )
-                , ( "font-size", "18px" )
-                , ( "border", "1px solid #aaa" )
+                , ( "display", "inline-block" )
+                , ( "padding-right", "5px" )
                 , ( "box-sizing", "border-box" )
+                ]
+
+        selectStyle =
+            style
+                [ ( "border", "1px solid #aaa" )
                 , ( "border-radius", "3px" )
+                , ( "box-sizing", "border-box" )
+                , ( "color", "#2b4564" )
+                , ( "font-size", "16px" )
+                , ( "height", "35px" )
+                , ( "width", "100%" )
                 ]
     in
         div
             [ style
                 [ ( "margin", "20px auto 20px auto" )
                 , ( "max-width", "800px" )
-                , ( "height", "36px" )
                 ]
             ]
             [ div
                 []
                 [ text model.errorMessage ]
+            , div
+                [ style
+                    [ ( "text-align", "center" )
+                    , ( "font-size", "40px" )
+                    , ( "margin-bottom", "80px" )
+                    , ( "color", "#2b4564" )
+                    , ( "font-weight", "bold" )
+                    ]
+                ]
+                [ text "Translation Quiz" ]
             , Html.form
-                [ onSubmit SubmitWord ]
-                [ select
-                    [ on "change" (JD.map UpdateFrom targetValue)
-                    , selectStyle
+                [ onSubmit SubmitWord
+                , style
+                    [ ( "height", "36px" )
+                    , ( "overflow", "hidden" )
                     ]
-                    ([ option
-                        [ value ""
-                        , disabled True
-                        , selected True
+                ]
+                [ div
+                    [ selectContainerStyle ]
+                    [ select
+                        [ on "change" (JD.map UpdateFrom targetValue)
+                        , selectStyle
                         ]
-                        [ text "From Language" ]
-                     ]
-                        ++ (List.map languageOption Reverso.languages)
-                    )
-                , select
-                    [ on "change" (JD.map UpdateTo targetValue)
-                    , selectStyle
+                        ([ option
+                            [ value ""
+                            , disabled True
+                            , selected True
+                            ]
+                            [ text "From Language" ]
+                         ]
+                            ++ (List.map languageOption Reverso.languages)
+                        )
                     ]
-                    ([ option
-                        [ value ""
-                        , disabled True
-                        , selected True
+                , div
+                    [ selectContainerStyle ]
+                    [ select
+                        [ on "change" (JD.map UpdateTo targetValue)
+                        , selectStyle
                         ]
-                        [ text "To Language" ]
-                     ]
-                        ++ (List.map languageOption Reverso.languages)
-                    )
+                        ([ option
+                            [ value ""
+                            , disabled True
+                            , selected True
+                            ]
+                            [ text "To Language" ]
+                         ]
+                            ++ (List.map languageOption Reverso.languages)
+                        )
+                    ]
                 , div
                     [ style
                         [ ( "width", "40%" )
-                        , ( "height", "36px" )
                         , ( "display", "inline-block" )
-                        , ( "border-radius", "3px" )
-                        , ( "border", "1px solid #aaa" )
+                        , ( "padding", "0px" )
                         , ( "box-sizing", "border-box" )
                         ]
                     ]
@@ -224,14 +250,14 @@ view model =
                         , value model.word
                         , placeholder "Word"
                         , style
-                            [ ( "width", "100%" )
-                            , ( "padding", "6px" )
-                            , ( "color", "#2b4564" )
-                            , ( "font-size", "18px" )
-                            , ( "height", "auto" )
-                            , ( "border", "none" )
-                            , ( "border-radius", "3px" )
+                            [ ( "border", "1px solid #aaa" )
+                            , ( "border-radius", "5px" )
                             , ( "box-sizing", "border-box" )
+                            , ( "color", "#2b4564" )
+                            , ( "font-size", "16px" )
+                            , ( "height", "35px" )
+                            , ( "padding", "0px 6px" )
+                            , ( "width", "100%" )
                             ]
                         ]
                         []
@@ -239,31 +265,23 @@ view model =
                 , div
                     [ style
                         [ ( "width", "20%" )
-                        , ( "height", "36px" )
                         , ( "display", "inline-block" )
-                        , ( "background-color", "#2b4564" )
-                        , ( "height", "36px" )
-                        , ( "border-radius", "3px" )
-                        , ( "color", "white" )
-                        , ( "text-align", "center" )
-                        , ( "border", "1px solid #000" )
-                        , ( "cursor", "pointer" )
                         , ( "box-sizing", "border-box" )
+                        , ( "padding-left", "5px" )
                         ]
                     ]
                     [ button
                         [ type' "submit"
                         , disabled buttonDisabled
                         , style
-                            [ ( "width", "100%" )
-                            , ( "background", "transparent" )
-                            , ( "height", "100%" )
-                            , ( "padding", "0px" )
-                            , ( "margin", "0px" )
-                            , ( "border", "0px" )
+                            [ ( "background-color", "#2b4564" )
+                            , ( "border", "1px solid #000" )
                             , ( "border-radius", "3px" )
-                            , ( "font-size", "18px" )
+                            , ( "box-sizing", "border-box" )
                             , ( "color", "white" )
+                            , ( "font-size", "16px" )
+                            , ( "height", "35px" )
+                            , ( "width", "100%" )
                             ]
                         ]
                         [ text "Search" ]

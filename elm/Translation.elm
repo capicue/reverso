@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Diff exposing (..)
+import String
 
 
 -- MODEL
@@ -109,13 +110,25 @@ diff model =
                             [ text str ]
                     else
                         span [] []
+        part1 =
+          if String.isEmpty model.state.guess
+          then
+            []
+          else
+            (List.map (viewPart 0) parts)
+                ++ [ div
+                     [ style
+                       [ ("height", "10px")]
+                     ]
+                     []
+                   ]
+        part2 =
+          (List.map (viewPart 1) parts)
+
     in
         div
             []
-            ((List.map (viewPart 0) parts)
-                ++ [ div [] [] ]
-                ++ (List.map (viewPart 1) parts)
-            )
+            (part1 ++ part2)
 
 
 view : Model -> Html Msg
@@ -173,10 +186,10 @@ view model =
                     [ input
                         [ value model.state.guess
                         , onInput UpdateGuess
+                        , placeholder "Guess"
                         , style
                             [ ( "width", "100%" )
                             , ( "font-size", "18px" )
-                            , ( "placeholder", "Guess" )
                             , ( "padding", "6px" )
                             , ( "border-radius", "3px" )
                             , ( "border", "1px solid #333" )
