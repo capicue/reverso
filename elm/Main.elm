@@ -206,6 +206,23 @@ view model =
                 [ ( "text-decoration", "none" )
                 , ( "color", "#006ea6" )
                 ]
+
+        buttonAttributes =
+            [ ( "background-color", "#2b4564" )
+            , ( "border", "1px solid #000" )
+            , ( "border-radius", "3px" )
+            , ( "box-sizing", "border-box" )
+            , ( "color", "white" )
+            , ( "font-size", "16px" )
+            , ( "height", "35px" )
+            , ( "width", "100%" )
+            ]
+
+        buttonStyle =
+            if buttonDisabled then
+                style (buttonAttributes ++ [ ( "opacity", "0.5" ) ])
+            else
+                style buttonAttributes
     in
         body
             [ style
@@ -314,16 +331,7 @@ view model =
                             [ button
                                 [ type' "submit"
                                 , disabled buttonDisabled
-                                , style
-                                    [ ( "background-color", "#2b4564" )
-                                    , ( "border", "1px solid #000" )
-                                    , ( "border-radius", "3px" )
-                                    , ( "box-sizing", "border-box" )
-                                    , ( "color", "white" )
-                                    , ( "font-size", "16px" )
-                                    , ( "height", "35px" )
-                                    , ( "width", "100%" )
-                                    ]
+                                , buttonStyle
                                 ]
                                 [ text "Search" ]
                             ]
