@@ -110,21 +110,21 @@ diff model =
                             [ text str ]
                     else
                         span [] []
-        part1 =
-          if String.isEmpty model.state.guess
-          then
-            []
-          else
-            (List.map (viewPart 0) parts)
-                ++ [ div
-                     [ style
-                       [ ("height", "10px")]
-                     ]
-                     []
-                   ]
-        part2 =
-          (List.map (viewPart 1) parts)
 
+        part1 =
+            if String.isEmpty model.state.guess then
+                []
+            else
+                (List.map (viewPart 0) parts)
+                    ++ [ div
+                            [ style
+                                [ ( "height", "10px" ) ]
+                            ]
+                            []
+                       ]
+
+        part2 =
+            (List.map (viewPart 1) parts)
     in
         div
             []

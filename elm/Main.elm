@@ -178,121 +178,178 @@ view model =
                 , ( "height", "35px" )
                 , ( "width", "100%" )
                 ]
+
+        linkStyle =
+            style
+                [ ( "text-decoration", "none" )
+                , ( "color", "#006ea6" )
+                ]
     in
-        div
+        body
             [ style
-                [ ( "margin", "20px auto 20px auto" )
+                [ ( "margin", "0px auto" )
+                , ( "padding", "0" )
+                , ( "height", "100%" )
                 , ( "max-width", "800px" )
                 ]
             ]
             [ div
-                []
-                [ text model.errorMessage ]
-            , div
-                [ style
-                    [ ( "text-align", "center" )
-                    , ( "font-size", "40px" )
-                    , ( "margin-bottom", "80px" )
-                    , ( "color", "#2b4564" )
-                    , ( "font-weight", "bold" )
-                    ]
-                ]
-                [ text "Translation Quiz" ]
-            , Html.form
-                [ onSubmit SubmitWord
+                [ id "container"
                 , style
-                    [ ( "height", "36px" )
-                    , ( "overflow", "hidden" )
+                    [ ( "min-height", "100%" )
+                    , ( "height", "100%" )
+                    , ( "position", "relative" )
                     ]
                 ]
                 [ div
-                    [ selectContainerStyle ]
-                    [ select
-                        [ on "change" (JD.map UpdateFrom targetValue)
-                        , selectStyle
-                        ]
-                        ([ option
-                            [ value ""
-                            , disabled True
-                            , selected True
-                            ]
-                            [ text "From Language" ]
-                         ]
-                            ++ (List.map languageOption Reverso.languages)
-                        )
-                    ]
-                , div
-                    [ selectContainerStyle ]
-                    [ select
-                        [ on "change" (JD.map UpdateTo targetValue)
-                        , selectStyle
-                        ]
-                        ([ option
-                            [ value ""
-                            , disabled True
-                            , selected True
-                            ]
-                            [ text "To Language" ]
-                         ]
-                            ++ (List.map languageOption Reverso.languages)
-                        )
-                    ]
-                , div
-                    [ style
-                        [ ( "width", "40%" )
-                        , ( "display", "inline-block" )
-                        , ( "padding", "0px" )
-                        , ( "box-sizing", "border-box" )
+                    [ id "body"
+                    , style
+                        [ ( "padding", "60px 10px" )
                         ]
                     ]
-                    [ input
-                        [ onInput UpdateWord
-                        , value model.word
-                        , placeholder "Word"
-                        , style
-                            [ ( "border", "1px solid #aaa" )
-                            , ( "border-radius", "5px" )
-                            , ( "box-sizing", "border-box" )
+                    [ div
+                        [ style
+                            [ ( "text-align", "center" )
+                            , ( "font-size", "40px" )
+                            , ( "margin-bottom", "80px" )
                             , ( "color", "#2b4564" )
-                            , ( "font-size", "16px" )
-                            , ( "height", "35px" )
-                            , ( "padding", "0px 6px" )
-                            , ( "width", "100%" )
+                            , ( "font-weight", "bold" )
                             ]
                         ]
-                        []
+                        [ text "Translation Quiz" ]
+                    , Html.form
+                        [ onSubmit SubmitWord
+                        , style
+                            [ ( "height", "36px" )
+                            , ( "overflow", "hidden" )
+                            ]
+                        ]
+                        [ div
+                            [ selectContainerStyle ]
+                            [ select
+                                [ on "change" (JD.map UpdateFrom targetValue)
+                                , selectStyle
+                                ]
+                                ([ option
+                                    [ value ""
+                                    , disabled True
+                                    , selected True
+                                    ]
+                                    [ text "From Language" ]
+                                 ]
+                                    ++ (List.map languageOption Reverso.languages)
+                                )
+                            ]
+                        , div
+                            [ selectContainerStyle ]
+                            [ select
+                                [ on "change" (JD.map UpdateTo targetValue)
+                                , selectStyle
+                                ]
+                                ([ option
+                                    [ value ""
+                                    , disabled True
+                                    , selected True
+                                    ]
+                                    [ text "To Language" ]
+                                 ]
+                                    ++ (List.map languageOption Reverso.languages)
+                                )
+                            ]
+                        , div
+                            [ style
+                                [ ( "width", "40%" )
+                                , ( "display", "inline-block" )
+                                , ( "padding", "0px" )
+                                , ( "box-sizing", "border-box" )
+                                ]
+                            ]
+                            [ input
+                                [ onInput UpdateWord
+                                , value model.word
+                                , placeholder "Word"
+                                , style
+                                    [ ( "border", "1px solid #aaa" )
+                                    , ( "border-radius", "5px" )
+                                    , ( "box-sizing", "border-box" )
+                                    , ( "color", "#2b4564" )
+                                    , ( "font-size", "16px" )
+                                    , ( "height", "35px" )
+                                    , ( "padding", "0px 6px" )
+                                    , ( "width", "100%" )
+                                    ]
+                                ]
+                                []
+                            ]
+                        , div
+                            [ style
+                                [ ( "width", "20%" )
+                                , ( "display", "inline-block" )
+                                , ( "box-sizing", "border-box" )
+                                , ( "padding-left", "5px" )
+                                ]
+                            ]
+                            [ button
+                                [ type' "submit"
+                                , disabled buttonDisabled
+                                , style
+                                    [ ( "background-color", "#2b4564" )
+                                    , ( "border", "1px solid #000" )
+                                    , ( "border-radius", "3px" )
+                                    , ( "box-sizing", "border-box" )
+                                    , ( "color", "white" )
+                                    , ( "font-size", "16px" )
+                                    , ( "height", "35px" )
+                                    , ( "width", "100%" )
+                                    ]
+                                ]
+                                [ text "Search" ]
+                            ]
+                        ]
+                    , div
+                        [ style
+                            [ ( "margin", "50px 0 0 0" )
+                            ]
+                        ]
+                        [ translationView ]
                     ]
                 , div
-                    [ style
-                        [ ( "width", "20%" )
-                        , ( "display", "inline-block" )
-                        , ( "box-sizing", "border-box" )
-                        , ( "padding-left", "5px" )
+                    [ id "footer"
+                    , style
+                        [ ( "position", "absolute" )
+                        , ( "bottom", "0" )
+                        , ( "width", "100%" )
+                        , ( "height", "60px" )
+                        , ( "text-align", "center" )
                         ]
                     ]
-                    [ button
-                        [ type' "submit"
-                        , disabled buttonDisabled
-                        , style
-                            [ ( "background-color", "#2b4564" )
-                            , ( "border", "1px solid #000" )
-                            , ( "border-radius", "3px" )
-                            , ( "box-sizing", "border-box" )
-                            , ( "color", "white" )
-                            , ( "font-size", "16px" )
-                            , ( "height", "35px" )
-                            , ( "width", "100%" )
+                    [ div
+                        [ style
+                            [ ( "color", "#2b4564" )
                             ]
                         ]
-                        [ text "Search" ]
+                        [ text "Built with "
+                        , a
+                            [ href "https://runkit.com/capicue/reverso"
+                            , linkStyle
+                            ]
+                            [ text "RunKit" ]
+                        , text " and "
+                        , a
+                            [ href "http://elm-lang.org/"
+                            , linkStyle
+                            ]
+                            [ text "Elm" ]
+                        , text ". Data from "
+                        , a
+                            [ href "http://context.reverso.net/translation/"
+                            , linkStyle
+                            ]
+                            [ text "Reverso Context" ]
+                        , text "."
+                        ]
                     ]
                 ]
-            , div
-                [ style
-                    [ ( "margin", "50px 0 0 0" )
-                    ]
-                ]
-                [ translationView ]
             ]
 
 
