@@ -151,7 +151,7 @@ view model =
             case model.list of
                 NotAsked ->
                     div []
-                        [ Spinner.view Spinner.defaultConfig model.spinner ]
+                        []
 
                 Loading ->
                     div
