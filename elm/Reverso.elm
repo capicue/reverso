@@ -1,9 +1,12 @@
 module Reverso exposing (..)
 
+import Array exposing (..)
 import Http
 import Json.Decode as JD
 import Task exposing (Task)
 import String
+import RemoteData
+import Translation
 
 
 languages : List String
@@ -21,7 +24,16 @@ decoder =
     JD.list (JD.tuple2 (,) JD.string JD.string)
 
 
-examples : String -> String -> String -> Task Http.Error (List ( String, String ))
+toTranslationArray : List ( String, String ) -> Array Translation.Model
+toTranslationArray list =
+    let
+        toTranslation i pair =
+            Translation.Model i (fst pair) (snd pair) Translation.initialState
+    in
+        fromList (List.indexedMap toTranslation list)
+
+
+examples : String -> String -> String -> Task Http.Error (Array Translation.Model)
 examples from to word =
     Http.send
         Http.defaultSettings
@@ -31,3 +43,4 @@ examples from to word =
         , body = Http.string ""
         }
         |> Http.fromJson decoder
+        |> Task.map toTranslationArray

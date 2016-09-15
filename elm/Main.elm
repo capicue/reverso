@@ -11,6 +11,7 @@ import Reverso
 import String
 import Task exposing (Task)
 import Translation
+import RemoteData exposing (..)
 
 
 main : Program Never
@@ -31,7 +32,7 @@ type alias Model =
     { from : String
     , to : String
     , word : String
-    , list : Array Translation.Model
+    , list : WebData (Array Translation.Model)
     , index : Int
     , errorMessage : String
     }
@@ -42,7 +43,7 @@ initialModel =
     { from = ""
     , to = ""
     , word = ""
-    , list = empty
+    , list = NotAsked
     , index = 0
     , errorMessage = ""
     }
@@ -62,8 +63,7 @@ type Msg
     | UpdateTo String
     | UpdateWord String
     | SubmitWord
-    | ReversoFail Http.Error
-    | ReversoSucceed (List ( String, String ))
+    | ReversoResponse (WebData (Array Translation.Model))
     | TranslationMsg Int Translation.Msg
 
 
@@ -80,39 +80,12 @@ update msg model =
             ( { model | word = str }, Cmd.none )
 
         SubmitWord ->
-            ( { model | index = 0, list = empty, errorMessage = "" }
-            , Task.perform ReversoFail ReversoSucceed (Reverso.examples model.from model.to model.word)
+            ( { model | index = 0, list = Loading, errorMessage = "" }
+            , Cmd.map ReversoResponse (RemoteData.asCmd (Reverso.examples model.from model.to model.word))
             )
 
-        ReversoFail err ->
-            let
-                msg =
-                    case err of
-                        Http.Timeout ->
-                            "The request timed out. Please try again."
-
-                        Http.NetworkError ->
-                            "Network error. Check your connection."
-
-                        Http.UnexpectedPayload str ->
-                            "Server returned an unexpected response."
-
-                        Http.BadResponse int str ->
-                            "Server error " ++ (toString int) ++ " " ++ str
-            in
-                ( { model | errorMessage = msg }, Cmd.none )
-
-        ReversoSucceed list ->
-            let
-                toTranslation i pair =
-                    Translation.Model i (fst pair) (snd pair) Translation.initialState
-
-                list' =
-                    List.indexedMap toTranslation list
-            in
-                ( { model | list = (fromList list'), errorMessage = "" }
-                , Cmd.none
-                )
+        ReversoResponse res ->
+            ( { model | list = res }, Cmd.none )
 
         TranslationMsg id msg ->
             case msg of
@@ -121,15 +94,21 @@ update msg model =
 
                 _ ->
                     let
-                        translation' =
-                            Maybe.map (Translation.update msg) (get id model.list)
-
                         list' =
-                            case translation' of
-                                Just translation ->
-                                    set id translation model.list
+                            case model.list of
+                                Success list ->
+                                    let
+                                        translation' =
+                                            Maybe.map (Translation.update msg) (get id list)
+                                    in
+                                        case translation' of
+                                            Just translation ->
+                                                Success (set id translation list)
 
-                                Nothing ->
+                                            Nothing ->
+                                                Success list
+
+                                _ ->
                                     model.list
                     in
                         ( { model | list = list' }, Cmd.none )
@@ -153,12 +132,36 @@ view model =
             (String.isEmpty model.from) || (String.isEmpty model.to) || (String.isEmpty model.word)
 
         translationView =
-            case get model.index model.list of
-                Just translation ->
-                    App.map (TranslationMsg model.index) (Translation.view translation)
-
-                Nothing ->
+            case model.list of
+                NotAsked ->
                     div [] []
+
+                Loading ->
+                    div [] [ text "loading..." ]
+
+                Failure err ->
+                    case err of
+                        Http.Timeout ->
+                            div [] [ text "The request timed out. Please try again." ]
+
+                        Http.NetworkError ->
+                            div [] [ text "Network error. Check your connection." ]
+
+                        Http.UnexpectedPayload str ->
+                            div [] [ text "Server returned an unexpected response." ]
+
+                        Http.BadResponse int str ->
+                            div [] [ text ("Server error " ++ (toString int) ++ " " ++ str) ]
+
+                Success list ->
+                    case get model.index list of
+                        Just translation ->
+                            App.map (TranslationMsg model.index) (Translation.view translation)
+
+                        Nothing ->
+                            div
+                                []
+                                [ text "That's it. Try a new word or phrase!" ]
 
         selectContainerStyle =
             style
@@ -267,7 +270,7 @@ view model =
                             [ input
                                 [ onInput UpdateWord
                                 , value model.word
-                                , placeholder "Word"
+                                , placeholder "Word or Phrase"
                                 , style
                                     [ ( "border", "1px solid #aaa" )
                                     , ( "border-radius", "5px" )
