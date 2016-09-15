@@ -178,9 +178,16 @@ view model =
                             App.map (TranslationMsg model.index) (Translation.view translation)
 
                         Nothing ->
-                            div
-                                []
-                                [ text "That's it. Try a new word or phrase!" ]
+                            let
+                                content =
+                                    if (Array.length list) > 0 then
+                                        "That's it. Try a new word or phrase!"
+                                    else
+                                        "No results. Try something else!"
+                            in
+                                div
+                                    []
+                                    [ text content ]
 
         selectContainerStyle =
             style
@@ -230,6 +237,7 @@ view model =
                 , ( "padding", "0" )
                 , ( "height", "100%" )
                 , ( "max-width", "800px" )
+                , ( "color", "#2b4564" )
                 ]
             ]
             [ div
@@ -251,7 +259,6 @@ view model =
                             [ ( "text-align", "center" )
                             , ( "font-size", "40px" )
                             , ( "margin-bottom", "80px" )
-                            , ( "color", "#2b4564" )
                             , ( "font-weight", "bold" )
                             ]
                         ]
@@ -354,10 +361,7 @@ view model =
                         ]
                     ]
                     [ div
-                        [ style
-                            [ ( "color", "#2b4564" )
-                            ]
-                        ]
+                        []
                         [ text "Built with "
                         , a
                             [ href "https://runkit.com/capicue/reverso"
