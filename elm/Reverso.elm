@@ -16,7 +16,7 @@ languages =
 
 url : String -> String -> String -> String
 url from to word =
-    "https://tonicdev.io/capicue/reverso/branches/master?from=" ++ from ++ "&to=" ++ to ++ "&word=" ++ word
+    "https://runkit.io/capicue/reverso/branches/master?from=" ++ from ++ "&to=" ++ to ++ "&word=" ++ word
 
 
 decoder : JD.Decoder (List ( String, String ))
