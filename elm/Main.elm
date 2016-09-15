@@ -34,7 +34,6 @@ type alias Model =
     , word : String
     , list : WebData (Array Translation.Model)
     , index : Int
-    , errorMessage : String
     }
 
 
@@ -45,7 +44,6 @@ initialModel =
     , word = ""
     , list = NotAsked
     , index = 0
-    , errorMessage = ""
     }
 
 
@@ -80,7 +78,7 @@ update msg model =
             ( { model | word = str }, Cmd.none )
 
         SubmitWord ->
-            ( { model | index = 0, list = Loading, errorMessage = "" }
+            ( { model | index = 0, list = Loading }
             , Cmd.map ReversoResponse (RemoteData.asCmd (Reverso.examples model.from model.to model.word))
             )
 
