@@ -7,11 +7,12 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
 import Json.Decode as JD
+import RemoteData exposing (..)
 import Reverso
+import Spinner
 import String
 import Task exposing (Task)
 import Translation
-import RemoteData exposing (..)
 
 
 main : Program Never
@@ -34,6 +35,7 @@ type alias Model =
     , word : String
     , list : WebData (Array Translation.Model)
     , index : Int
+    , spinner : Spinner.Model
     }
 
 
@@ -44,6 +46,7 @@ initialModel =
     , word = ""
     , list = NotAsked
     , index = 0
+    , spinner = Spinner.init
     }
 
 
@@ -60,6 +63,7 @@ type Msg
     = UpdateFrom String
     | UpdateTo String
     | UpdateWord String
+    | SpinnerMsg Spinner.Msg
     | SubmitWord
     | ReversoResponse (WebData (Array Translation.Model))
     | TranslationMsg Int Translation.Msg
@@ -111,6 +115,13 @@ update msg model =
                     in
                         ( { model | list = list' }, Cmd.none )
 
+        SpinnerMsg msg ->
+            let
+                spinnerModel =
+                    Spinner.update msg model.spinner
+            in
+                ( { model | spinner = spinnerModel }, Cmd.none )
+
 
 
 -- VIEW
@@ -129,13 +140,23 @@ view model =
         buttonDisabled =
             (String.isEmpty model.from) || (String.isEmpty model.to) || (String.isEmpty model.word)
 
+        spinnerConfig =
+            let
+                config =
+                    Spinner.defaultConfig
+            in
+                { config | translateX = 0, translateY = 0 }
+
         translationView =
             case model.list of
                 NotAsked ->
-                    div [] []
+                    div []
+                        [ Spinner.view Spinner.defaultConfig model.spinner ]
 
                 Loading ->
-                    div [] [ text "loading..." ]
+                    div
+                        []
+                        [ Spinner.view Spinner.defaultConfig model.spinner ]
 
                 Failure err ->
                     case err of
@@ -360,4 +381,4 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Sub.map SpinnerMsg Spinner.subscription
