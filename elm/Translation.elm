@@ -72,50 +72,69 @@ update msg model =
 -- VIEW
 
 
-diff : Model -> Html Msg
-diff model =
+diff : String -> String -> Html Msg
+diff str1 str2 =
     let
         parts =
-            diffChars model.state.guess model.target
+            diffChars str1 str2
 
-        viewPart int part =
+        grey =
+            "#666"
+
+        purple =
+            "#9a5ea7"
+
+        red =
+            "#c55353"
+
+        green =
+            "#5ea766"
+
+        viewSource part =
             case part of
                 NoChange str ->
                     span
-                        [ style [ ( "color", "#666" ) ] ]
+                        [ style [ ( "color", grey ) ] ]
                         [ text str ]
 
                 Changed str1 str2 ->
-                    if int == 0 then
-                        span
-                            [ style [ ( "color", "#9a5ea7" ) ] ]
-                            [ text str1 ]
-                    else
-                        span
-                            [ style [ ( "color", "#9a5ea7" ) ] ]
-                            [ text str2 ]
+                    span
+                        [ style [ ( "color", purple ) ] ]
+                        [ text str1 ]
 
                 Added str ->
-                    if int == 0 then
-                        span [] []
-                    else
-                        span
-                            [ style [ ( "color", "#5ea766" ) ] ]
-                            [ text str ]
+                    span [] []
 
                 Removed str ->
-                    if int == 0 then
-                        span
-                            [ style [ ( "color", "#c55353" ) ] ]
-                            [ text str ]
-                    else
-                        span [] []
+                    span
+                        [ style [ ( "color", red ) ] ]
+                        [ text str ]
+
+        viewTarget part =
+            case part of
+                NoChange str ->
+                    span
+                        [ style [ ( "color", grey ) ] ]
+                        [ text str ]
+
+                Changed str1 str2 ->
+                    span
+                        [ style [ ( "color", purple ) ] ]
+                        [ text str2 ]
+
+                Added str ->
+                    span
+                        [ style [ ( "color", green ) ] ]
+                        [ text str ]
+
+                Removed str ->
+                    span [] []
 
         part1 =
-            if String.isEmpty model.state.guess then
+            if String.isEmpty str1 then
                 []
             else
-                (List.map (viewPart 0) parts)
+                (List.map viewSource parts)
                     ++ [ div
                             [ style
                                 [ ( "height", "10px" ) ]
@@ -124,7 +143,7 @@ diff model =
                        ]
 
         part2 =
-            (List.map (viewPart 1) parts)
+            (List.map viewTarget parts)
     in
         div
             []
@@ -163,7 +182,7 @@ view model =
                         , ( "padding", "20px" )
                         ]
                     ]
-                    [ diff model ]
+                    [ diff model.state.guess model.target ]
                 , button
                     [ type' "submit"
                     , buttonStyle
