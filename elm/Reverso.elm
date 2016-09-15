@@ -19,18 +19,18 @@ url from to word =
     "https://runkit.io/capicue/reverso/branches/master?from=" ++ from ++ "&to=" ++ to ++ "&word=" ++ word
 
 
-decoder : JD.Decoder (List ( String, String ))
+decoder : JD.Decoder (Array ( String, String ))
 decoder =
-    JD.list (JD.tuple2 (,) JD.string JD.string)
+    JD.array (JD.tuple2 (,) JD.string JD.string)
 
 
-toTranslationArray : List ( String, String ) -> Array Translation.Model
+toTranslationArray : Array ( String, String ) -> Array Translation.Model
 toTranslationArray list =
     let
         toTranslation i pair =
             Translation.Model i (fst pair) (snd pair) Translation.initialState
     in
-        fromList (List.indexedMap toTranslation list)
+        Array.indexedMap toTranslation list
 
 
 examples : String -> String -> String -> Task Http.Error (Array Translation.Model)
