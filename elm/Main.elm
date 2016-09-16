@@ -7,6 +7,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
 import Json.Decode as JD
+import Keyboard
 import RemoteData exposing (..)
 import Reverso
 import Spinner
@@ -67,6 +68,7 @@ type Msg
     | SubmitWord
     | ReversoResponse (WebData (Array Translation.Model))
     | TranslationMsg Int Translation.Msg
+    | KeyPress Keyboard.KeyCode
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -121,6 +123,27 @@ update msg model =
                     Spinner.update msg model.spinner
             in
                 ( { model | spinner = spinnerModel }, Cmd.none )
+
+        KeyPress code ->
+            case Debug.log "keycode" code of
+                13 ->
+                    case model.list of
+                        Success list ->
+                            case get model.index list of
+                                Just translation ->
+                                    if translation.state.checked then
+                                        update (TranslationMsg model.index Translation.Next) model
+                                    else
+                                        update (TranslationMsg model.index Translation.CheckGuess) model
+
+                                Nothing ->
+                                    ( model, Cmd.none )
+
+                        _ ->
+                            ( model, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
 
 
 
@@ -393,4 +416,7 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.map SpinnerMsg Spinner.subscription
+    Sub.batch
+        [ Sub.map SpinnerMsg Spinner.subscription
+        , Keyboard.presses KeyPress
+        ]

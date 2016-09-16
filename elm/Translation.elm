@@ -39,6 +39,7 @@ type Msg
     = UpdateGuess String
     | CheckGuess
     | Next
+    | NoOp
 
 
 update : Msg -> Model -> Model
@@ -65,6 +66,9 @@ update msg model =
                 { model | state = state' }
 
         Next ->
+            model
+
+        NoOp ->
             model
 
 
@@ -166,8 +170,8 @@ view model =
                 ]
     in
         if model.state.checked then
-            Html.form
-                [ onSubmit Next ]
+            div
+                []
                 [ div
                     [ style
                         [ ( "font-size", "18px" )
@@ -184,14 +188,14 @@ view model =
                     ]
                     [ diff model.state.guess model.target ]
                 , button
-                    [ type' "submit"
-                    , buttonStyle
+                    [ buttonStyle
+                    , onClick Next
                     ]
                     [ text "Next" ]
                 ]
         else
-            Html.form
-                [ onSubmit CheckGuess ]
+            div
+                []
                 [ div
                     [ style
                         [ ( "font-size", "18px" )
@@ -218,8 +222,8 @@ view model =
                         []
                     ]
                 , button
-                    [ type' "submit"
-                    , buttonStyle
+                    [ buttonStyle
+                    , onClick CheckGuess
                     ]
                     [ text "Check" ]
                 ]
