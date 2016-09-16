@@ -13,7 +13,7 @@ import Reverso
 import Spinner
 import String
 import Task exposing (Task)
-import Translation
+import TranslationList
 
 
 main : Program Never
@@ -34,8 +34,7 @@ type alias Model =
     { from : String
     , to : String
     , word : String
-    , list : WebData (Array Translation.Model)
-    , index : Int
+    , list : WebData (TranslationList.Model)
     , spinner : Spinner.Model
     }
 
@@ -46,7 +45,6 @@ initialModel =
     , to = ""
     , word = ""
     , list = NotAsked
-    , index = 0
     , spinner = Spinner.init
     }
 
@@ -66,8 +64,8 @@ type Msg
     | UpdateWord String
     | SpinnerMsg Spinner.Msg
     | SubmitWord
-    | ReversoResponse (WebData (Array Translation.Model))
-    | TranslationMsg Int Translation.Msg
+    | ReversoResponse (WebData TranslationList.Model)
+    | TranslationListMsg TranslationList.Msg
     | KeyPress Keyboard.KeyCode
 
 
@@ -84,38 +82,24 @@ update msg model =
             ( { model | word = str }, Cmd.none )
 
         SubmitWord ->
-            ( { model | index = 0, list = Loading }
+            ( { model | list = Loading }
             , Cmd.map ReversoResponse (RemoteData.asCmd (Reverso.examples model.from model.to model.word))
             )
 
         ReversoResponse res ->
             ( { model | list = res }, Cmd.none )
 
-        TranslationMsg id msg ->
-            case msg of
-                Translation.Next ->
-                    ( { model | index = model.index + 1 }, Cmd.none )
-
-                _ ->
+        TranslationListMsg msg ->
+            case model.list of
+                Success list ->
                     let
                         list' =
-                            case model.list of
-                                Success list ->
-                                    let
-                                        translation' =
-                                            Maybe.map (Translation.update msg) (get id list)
-                                    in
-                                        case translation' of
-                                            Just translation ->
-                                                Success (set id translation list)
-
-                                            Nothing ->
-                                                Success list
-
-                                _ ->
-                                    model.list
+                            TranslationList.update msg list
                     in
-                        ( { model | list = list' }, Cmd.none )
+                        ( { model | list = Success list' }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
 
         SpinnerMsg msg ->
             let
@@ -125,19 +109,15 @@ update msg model =
                 ( { model | spinner = spinnerModel }, Cmd.none )
 
         KeyPress code ->
-            case Debug.log "keycode" code of
+            case code of
                 13 ->
                     case model.list of
                         Success list ->
-                            case get model.index list of
-                                Just translation ->
-                                    if translation.state.checked then
-                                        update (TranslationMsg model.index Translation.Next) model
-                                    else
-                                        update (TranslationMsg model.index Translation.CheckGuess) model
-
-                                Nothing ->
-                                    ( model, Cmd.none )
+                            let
+                                list' =
+                                    TranslationList.update TranslationList.EnterPressed list
+                            in
+                                ( { model | list = Success list' }, Cmd.none )
 
                         _ ->
                             ( model, Cmd.none )
@@ -196,21 +176,7 @@ view model =
                             div [] [ text ("Server error " ++ (toString int) ++ " " ++ str) ]
 
                 Success list ->
-                    case get model.index list of
-                        Just translation ->
-                            App.map (TranslationMsg model.index) (Translation.view translation)
-
-                        Nothing ->
-                            let
-                                content =
-                                    if (Array.length list) > 0 then
-                                        "That's it. Try a new word or phrase!"
-                                    else
-                                        "No results. Try something else!"
-                            in
-                                div
-                                    []
-                                    [ text content ]
+                    App.map TranslationListMsg (TranslationList.view list)
 
         selectContainerStyle =
             style

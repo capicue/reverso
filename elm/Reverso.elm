@@ -1,12 +1,11 @@
 module Reverso exposing (..)
 
-import Array exposing (..)
 import Http
 import Json.Decode as JD
 import Task exposing (Task)
 import String
 import RemoteData
-import Translation
+import TranslationList
 
 
 languages : List String
@@ -19,21 +18,23 @@ url from to word =
     "https://runkit.io/capicue/reverso/branches/master?from=" ++ from ++ "&to=" ++ to ++ "&word=" ++ word
 
 
-decoder : JD.Decoder (Array ( String, String ))
+decoder : JD.Decoder (List ( String, String ))
 decoder =
-    JD.array (JD.tuple2 (,) JD.string JD.string)
+    JD.list (JD.tuple2 (,) JD.string JD.string)
 
 
-toTranslationArray : Array ( String, String ) -> Array Translation.Model
-toTranslationArray list =
+toTranslationList : List ( String, String ) -> TranslationList.Model
+toTranslationList list =
     let
-        toTranslation i pair =
-            Translation.Model i (fst pair) (snd pair) Translation.initialState
+        toTranslation pair =
+            TranslationList.Translation (fst pair) (snd pair) TranslationList.initialTranslationState
     in
-        Array.indexedMap toTranslation list
+        TranslationList.Model
+            []
+            (List.map toTranslation list)
 
 
-examples : String -> String -> String -> Task Http.Error (Array Translation.Model)
+examples : String -> String -> String -> Task Http.Error TranslationList.Model
 examples from to word =
     Http.send
         Http.defaultSettings
@@ -43,4 +44,4 @@ examples from to word =
         , body = Http.string ""
         }
         |> Http.fromJson decoder
-        |> Task.map toTranslationArray
+        |> Task.map toTranslationList

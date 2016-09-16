@@ -1,34 +1,49 @@
-module Translation exposing (..)
+module TranslationList exposing (..)
 
+import Diff exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Diff exposing (..)
 import String
 
 
 -- MODEL
 
 
-type alias Model =
-    { id : Int
-    , source : String
+type alias Translation =
+    { source : String
     , target : String
-    , state : State
+    , state : TranslationState
     }
 
 
-type alias State =
+type alias TranslationState =
     { guess : String
     , checked : Bool
     }
 
 
-initialState : State
-initialState =
+initialTranslationState : TranslationState
+initialTranslationState =
     { guess = ""
     , checked = False
     }
+
+
+type alias Model =
+    { seen : List Translation
+    , unseen : List Translation
+    }
+
+
+current : Model -> Maybe Translation
+current model =
+    List.head model.unseen
+
+
+isEmpty : Model -> Bool
+isEmpty model =
+    List.isEmpty model.seen && List.isEmpty model.unseen
 
 
 
@@ -39,41 +54,93 @@ type Msg
     = UpdateGuess String
     | CheckGuess
     | Next
-    | NoOp
+    | EnterPressed
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
         UpdateGuess guess ->
-            let
-                state =
-                    model.state
-
-                state' =
-                    { state | guess = guess }
-            in
-                ({ model | state = state' })
+            updateCurrent (updateGuess guess) model
 
         CheckGuess ->
-            let
-                state =
-                    model.state
-
-                state' =
-                    { state | checked = True }
-            in
-                { model | state = state' }
+            updateCurrent setChecked model
 
         Next ->
+            case model.unseen of
+                x :: xs ->
+                    { model | seen = model.seen ++ [ x ], unseen = xs }
+
+                _ ->
+                    model
+
+        EnterPressed ->
+            case current model of
+                Just translation ->
+                    if translation.state.checked then
+                        update Next model
+                    else
+                        update CheckGuess model
+
+                Nothing ->
+                    model
+
+
+updateCurrent : (Translation -> Translation) -> Model -> Model
+updateCurrent function model =
+    case model.unseen of
+        x :: xs ->
+            { model | unseen = (function x) :: xs }
+
+        _ ->
             model
 
-        NoOp ->
-            model
+
+updateGuess : String -> Translation -> Translation
+updateGuess guess translation =
+    let
+        state =
+            translation.state
+
+        state' =
+            { state | guess = guess }
+    in
+        { translation | state = state' }
+
+
+setChecked : Translation -> Translation
+setChecked translation =
+    let
+        state =
+            translation.state
+
+        state' =
+            { state | checked = True }
+    in
+        { translation | state = state' }
 
 
 
 -- VIEW
+
+
+view : Model -> Html Msg
+view model =
+    case current model of
+        Just translation ->
+            viewTranslation translation
+
+        Nothing ->
+            let
+                content =
+                    if isEmpty model then
+                        "No results. Try something else!"
+                    else
+                        "That's it. Try a new word or phrase!"
+            in
+                div
+                    []
+                    [ text content ]
 
 
 diff : String -> String -> Html Msg
@@ -154,8 +221,8 @@ diff str1 str2 =
             (part1 ++ part2)
 
 
-view : Model -> Html Msg
-view model =
+viewTranslation : Translation -> Html Msg
+viewTranslation translation =
     let
         buttonStyle =
             style
@@ -169,7 +236,7 @@ view model =
                 , ( "padding", "6px" )
                 ]
     in
-        if model.state.checked then
+        if translation.state.checked then
             div
                 []
                 [ div
@@ -179,14 +246,14 @@ view model =
                         , ( "margin-bottom", "10px" )
                         ]
                     ]
-                    [ text model.source ]
+                    [ text translation.source ]
                 , div
                     [ style
                         [ ( "background-color", "#eee" )
                         , ( "padding", "20px" )
                         ]
                     ]
-                    [ diff model.state.guess model.target ]
+                    [ diff translation.state.guess translation.target ]
                 , button
                     [ buttonStyle
                     , onClick Next
@@ -203,11 +270,11 @@ view model =
                         , ( "margin-bottom", "10px" )
                         ]
                     ]
-                    [ text model.source ]
+                    [ text translation.source ]
                 , div
                     []
                     [ input
-                        [ value model.state.guess
+                        [ value translation.state.guess
                         , onInput UpdateGuess
                         , placeholder "Guess"
                         , style
