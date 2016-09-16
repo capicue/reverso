@@ -161,7 +161,7 @@ view : Model -> Html Msg
 view model =
     let
         buttonDisabled =
-            (String.isEmpty model.from) || (String.isEmpty model.to) || (String.isEmpty model.word)
+            (String.isEmpty model.from) || (String.isEmpty model.to) || (String.isEmpty model.word) || model.from == model.to
 
         spinnerConfig =
             let
