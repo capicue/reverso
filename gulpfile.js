@@ -21,7 +21,7 @@ gulp.task('elm-init', function() {
 gulp.task('elm', ['elm-init'], function() {
     return gulp.src(config.elm.src)
         .pipe(plumber())
-        .pipe(elm.bundle("index.html", {filetype: "html"}))
+        .pipe(elm.bundle("reverso.js"))
         .pipe(gulp.dest(config.elm.dest));
 });
 

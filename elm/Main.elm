@@ -275,7 +275,7 @@ view model =
                 Success list ->
                     App.map TranslationListMsg (TranslationList.view list)
     in
-        body
+        div
             [ style styles.body ]
             [ div
                 [ style styles.container ]
