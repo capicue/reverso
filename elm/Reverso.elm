@@ -10,7 +10,18 @@ import TranslationList
 
 languages : List String
 languages =
-    [ "arabic", "german", "english", "spanish", "french", "hebrew", "italian", "dutch", "polish", "portuguese", "russian" ]
+    [ "arabic"
+    , "german"
+    , "english"
+    , "spanish"
+    , "french"
+    , "hebrew"
+    , "italian"
+    , "dutch"
+    , "polish"
+    , "portuguese"
+    , "russian"
+    ]
 
 
 url : String -> String -> String -> String

@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import String
+import Styles
 
 
 -- MODEL
@@ -124,6 +125,47 @@ setChecked translation =
 -- VIEW
 
 
+styles =
+    { container =
+        [ ( "font-size", "18px" )
+        , ( "color", "#333" )
+        , ( "margin-bottom", "10px" )
+        ]
+    , diffContainer =
+        [ ( "background-color", "#eee" )
+        , ( "padding", "20px" )
+        ]
+    , partsSeparator =
+        [ ( "height", "10px" ) ]
+    , buttonCheck =
+        [ ( "margin-top", "20px" )
+        , ( "font-size", "14px" )
+        , ( "height", "auto" )
+        , ( "background-color", "#2b4564" )
+        , ( "color", "white" )
+        , ( "border-radius", "3px" )
+        , ( "border", "1px solid black" )
+        , ( "padding", "6px" )
+        ]
+    , guess =
+        [ ( "width", "100%" )
+        , ( "font-size", "18px" )
+        , ( "padding", "6px" )
+        , ( "border-radius", "3px" )
+        , ( "border", "1px solid #333" )
+        , ( "box-sizing", "border-box" )
+        ]
+    , grey =
+        [ ( "color", (.grey) Styles.colors ) ]
+    , red =
+        [ ( "color", (.red) Styles.colors ) ]
+    , green =
+        [ ( "color", (.green) Styles.colors ) ]
+    , purple =
+        [ ( "color", (.purple) Styles.colors ) ]
+    }
+
+
 view : Model -> Html Msg
 view model =
     case current model of
@@ -149,28 +191,16 @@ diff str1 str2 =
         parts =
             diffChars str1 str2
 
-        grey =
-            "#666"
-
-        purple =
-            "#9a5ea7"
-
-        red =
-            "#c55353"
-
-        green =
-            "#5ea766"
-
         viewSource part =
             case part of
                 NoChange str ->
                     span
-                        [ style [ ( "color", grey ) ] ]
+                        [ style styles.grey ]
                         [ text str ]
 
                 Changed str1 str2 ->
                     span
-                        [ style [ ( "color", purple ) ] ]
+                        [ style styles.purple ]
                         [ text str1 ]
 
                 Added str ->
@@ -178,24 +208,24 @@ diff str1 str2 =
 
                 Removed str ->
                     span
-                        [ style [ ( "color", red ) ] ]
+                        [ style styles.red ]
                         [ text str ]
 
         viewTarget part =
             case part of
                 NoChange str ->
                     span
-                        [ style [ ( "color", grey ) ] ]
+                        [ style styles.grey ]
                         [ text str ]
 
                 Changed str1 str2 ->
                     span
-                        [ style [ ( "color", purple ) ] ]
+                        [ style styles.purple ]
                         [ text str2 ]
 
                 Added str ->
                     span
-                        [ style [ ( "color", green ) ] ]
+                        [ style styles.green ]
                         [ text str ]
 
                 Removed str ->
@@ -207,9 +237,7 @@ diff str1 str2 =
             else
                 (List.map viewSource parts)
                     ++ [ div
-                            [ style
-                                [ ( "height", "10px" ) ]
-                            ]
+                            [ style styles.partsSeparator ]
                             []
                        ]
 
@@ -224,73 +252,47 @@ diff str1 str2 =
 viewTranslation : Translation -> Html Msg
 viewTranslation translation =
     let
-        buttonStyle =
-            style
-                [ ( "margin-top", "20px" )
-                , ( "font-size", "14px" )
-                , ( "height", "auto" )
-                , ( "background-color", "#2b4564" )
-                , ( "color", "white" )
-                , ( "border-radius", "3px" )
-                , ( "border", "1px solid #000" )
-                , ( "padding", "6px" )
-                ]
-    in
-        if translation.state.checked then
-            div
-                []
-                [ div
-                    [ style
-                        [ ( "font-size", "18px" )
-                        , ( "color", "#333" )
-                        , ( "margin-bottom", "10px" )
-                        ]
-                    ]
-                    [ text translation.source ]
-                , div
-                    [ style
-                        [ ( "background-color", "#eee" )
-                        , ( "padding", "20px" )
-                        ]
-                    ]
+        checked =
+            translation.state.checked
+
+        content =
+            if checked then
+                div
+                    [ style styles.diffContainer ]
                     [ diff translation.state.guess translation.target ]
-                , button
-                    [ buttonStyle
-                    , onClick Next
-                    ]
-                    [ text "Next" ]
-                ]
-        else
-            div
-                []
-                [ div
-                    [ style
-                        [ ( "font-size", "18px" )
-                        , ( "color", "#333" )
-                        , ( "margin-bottom", "10px" )
-                        ]
-                    ]
-                    [ text translation.source ]
-                , div
+            else
+                div
                     []
                     [ input
                         [ value translation.state.guess
                         , onInput UpdateGuess
                         , placeholder "Guess"
-                        , style
-                            [ ( "width", "100%" )
-                            , ( "font-size", "18px" )
-                            , ( "padding", "6px" )
-                            , ( "border-radius", "3px" )
-                            , ( "border", "1px solid #333" )
-                            , ( "box-sizing", "border-box" )
-                            ]
+                        , style styles.guess
                         ]
                         []
                     ]
-                , button
-                    [ buttonStyle
+
+        checkOrNextButton =
+            if checked then
+                button
+                    [ style styles.buttonCheck
+                    , onClick Next
+                    ]
+                    [ text "Next" ]
+            else
+                button
+                    [ style styles.buttonCheck
                     , onClick CheckGuess
                     ]
                     [ text "Check" ]
+    in
+        div
+            []
+            [ div
+                [ style styles.container
                 ]
+                [ text translation.source
+                , content
+                , checkOrNextButton
+                ]
+            ]
