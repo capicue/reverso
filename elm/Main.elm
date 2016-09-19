@@ -369,17 +369,29 @@ view model =
                         []
                         [ text "Built with "
                         , a
-                            [ href "https://runkit.com/capicue/reverso"
+                            [ href "https://runkit.com"
                             , style styles.footerLink
                             ]
                             [ text "RunKit" ]
-                        , text " and "
+                        , text " ("
+                        , a
+                            [ href "https://runkit.com/capicue/reverso"
+                            , style styles.footerLink
+                            ]
+                            [ text "source" ]
+                        , text ") and "
                         , a
                             [ href "http://elm-lang.org/"
                             , style styles.footerLink
                             ]
                             [ text "Elm" ]
-                        , text ". Data from "
+                        , text " ("
+                        , a
+                            [ href "http://github.com/capicue/reverso"
+                            , style styles.footerLink
+                            ]
+                            [ text "source" ]
+                        , text "). Data from "
                         , a
                             [ href "http://context.reverso.net/translation/"
                             , style styles.footerLink
