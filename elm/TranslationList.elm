@@ -136,6 +136,8 @@ styles =
         , ( "color", "#333" )
         , ( "margin-bottom", "10px" )
         ]
+    , originalText =
+        [ ( "margin-bottom", "20px" ) ]
     , diffContainer =
         [ ( "background-color", "#eee" )
         , ( "padding", "20px" )
@@ -297,7 +299,9 @@ viewTranslation translation =
             [ div
                 [ style styles.container
                 ]
-                [ text translation.source
+                [ div
+                    [ style styles.originalText ]
+                    [ text translation.source ]
                 , content
                 , checkOrNextButton
                 ]
