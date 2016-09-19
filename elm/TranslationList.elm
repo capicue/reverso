@@ -58,22 +58,27 @@ type Msg
     | EnterPressed
 
 
-update : Msg -> Model -> Model
+type ParentMsg
+    = FocusGuess
+    | NoOp
+
+
+update : Msg -> Model -> ( Model, ParentMsg )
 update msg model =
     case msg of
         UpdateGuess guess ->
-            updateCurrent (updateGuess guess) model
+            ( updateCurrent (updateGuess guess) model, NoOp )
 
         CheckGuess ->
-            updateCurrent setChecked model
+            ( updateCurrent setChecked model, NoOp )
 
         Next ->
             case model.unseen of
                 x :: xs ->
-                    { model | seen = model.seen ++ [ x ], unseen = xs }
+                    ( { model | seen = model.seen ++ [ x ], unseen = xs }, FocusGuess )
 
                 _ ->
-                    model
+                    ( model, NoOp )
 
         EnterPressed ->
             case current model of
@@ -84,7 +89,7 @@ update msg model =
                         update CheckGuess model
 
                 Nothing ->
-                    model
+                    ( model, NoOp )
 
 
 updateCurrent : (Translation -> Translation) -> Model -> Model
@@ -264,7 +269,8 @@ viewTranslation translation =
                 div
                     []
                     [ input
-                        [ value translation.state.guess
+                        [ id "guess"
+                        , value translation.state.guess
                         , onInput UpdateGuess
                         , placeholder "Guess"
                         , style styles.guess

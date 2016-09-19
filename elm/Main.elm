@@ -1,4 +1,4 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Array exposing (..)
 import Html exposing (..)
@@ -93,10 +93,16 @@ update msg model =
             case model.list of
                 Success list ->
                     let
-                        list' =
+                        ( list', parentMsg ) =
                             TranslationList.update msg list
+
+                        cmd =
+                            if parentMsg == TranslationList.FocusGuess then
+                                focusGuess ()
+                            else
+                                Cmd.none
                     in
-                        ( { model | list = Success list' }, Cmd.none )
+                        ( { model | list = Success list' }, cmd )
 
                 _ ->
                     ( model, Cmd.none )
@@ -114,16 +120,29 @@ update msg model =
                     case model.list of
                         Success list ->
                             let
-                                list' =
+                                ( list', parentMsg ) =
                                     TranslationList.update TranslationList.EnterPressed list
+
+                                cmd =
+                                    if parentMsg == TranslationList.FocusGuess then
+                                        focusGuess ()
+                                    else
+                                        Cmd.none
                             in
-                                ( { model | list = Success list' }, Cmd.none )
+                                ( { model | list = Success list' }, cmd )
 
                         _ ->
                             ( model, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
+
+
+
+-- PORTS
+
+
+port focusGuess : () -> Cmd msg
 
 
 

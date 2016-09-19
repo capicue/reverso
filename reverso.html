@@ -18,6 +18,13 @@
 
 <script type="text/javascript">
   var app = Elm.Main.fullscreen();
+
+  app.ports.focusGuess.subscribe(function () {
+    window.requestAnimationFrame(function () {
+      console.log("here");
+      document.getElementById("guess").focus();
+    });
+  });
 </script>
 
 </html>
